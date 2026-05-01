@@ -8,9 +8,12 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
 import java.time.LocalDateTime;
 import java.util.HashMap;
 import java.util.Map;
+import org.springdoc.api.ErrorMessage;
+import org.springframework.web.bind.annotation.RestControllerAdvice;
 
-@RestControllerAdvice
+@RestControllerAdvice(basePackages = "com.bankapp.bankapp.controller")
 public class GlobalExceptionHandler {
+    
 
     @ExceptionHandler(RuntimeException.class)
     public ResponseEntity<Map<String, Object>> handleRuntimeException(RuntimeException ex) {
@@ -21,12 +24,13 @@ public class GlobalExceptionHandler {
         return ResponseEntity.badRequest().body(error);
     }
 
-    @ExceptionHandler(Exception.class)
-    public ResponseEntity<Map<String, Object>> handleException(Exception ex) {
-        Map<String, Object> error = new HashMap<>();
-        error.put("timestamp", LocalDateTime.now());
-        error.put("message", "An unexpected error occurred");
-        error.put("status", HttpStatus.INTERNAL_SERVER_ERROR.value());
-        return ResponseEntity.internalServerError().body(error);
-    }
+   @ExceptionHandler(Exception.class)
+public ResponseEntity<Map<String, Object>> handleException(Exception ex) {
+    Map<String, Object> error = new HashMap<>();
+    error.put("timestamp", LocalDateTime.now());
+    error.put("message", ex.getMessage());
+    error.put("cause", ex.getCause() != null ? ex.getCause().getMessage() : "none");
+    error.put("status", HttpStatus.INTERNAL_SERVER_ERROR.value());
+    return ResponseEntity.internalServerError().body(error);
+}
 }
